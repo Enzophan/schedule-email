@@ -13,6 +13,7 @@ env:
   USER_EMAIL_PASSWORD: ${{ secrets.USER_EMAIL_PASSWORD }}
   MAIL_FROM: ${{ secrets.MAIL_FROM }}
   MAIL_TO: ${{ secrets.MAIL_TO }}
+  API_KEY: ${{ secrets.API_KEY }}
 
 jobs:
   report:
