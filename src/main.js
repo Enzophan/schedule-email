@@ -2,10 +2,11 @@ require('dotenv').config();
 const fetch = require('node-fetch');
 const nodemailer = require("nodemailer");
 const moment = require('moment');
+const momentTZ = require('moment-timezone');
 const querystring = require('querystring');
 
 (async function run() {
-    const date = moment().tz('Asian/Ho_Chi_Minh').format('MMMM Do YYYY, h:mm:ss a');
+    const date = momentTZ().tz('Asian/Ho_Chi_Minh').format('MMMM Do YYYY, h:mm:ss a');
 
     console.log('Running report: ', date);
     const apiKey = {
