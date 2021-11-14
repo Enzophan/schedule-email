@@ -5,7 +5,7 @@ const moment = require('moment');
 const querystring = require('querystring');
 
 (async function run() {
-    const date = moment().format('MMMM Do YYYY, h:mm:ss a');
+    const date = moment().tz('Asian/Ho_Chi_Minh').format('MMMM Do YYYY, h:mm:ss a');
 
     console.log('Running report: ', date);
     const apiKey = {
