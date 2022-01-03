@@ -1,11 +1,19 @@
 require('dotenv').config();
 const fetch = require('node-fetch');
 const nodemailer = require("nodemailer");
-const moment = require('moment');
+// const moment = require('moment');
 const momentTZ = require('moment-timezone');
 const querystring = require('querystring');
+const { getPriceFeed } = require('./cryto');
 
 (async function run() {
+    const priceFeed = await getPriceFeed();
+    const crytoPrice = priceFeed.map(item => {
+        return (`
+            <p>${item.name}: ${item.price}</p>
+        `)
+    }).join('');
+
     const date = momentTZ().tz('Asian/Ho_Chi_Minh').format('MMMM Do YYYY, h:mm:ss a');
 
     console.log('Running report: ', date);
@@ -47,6 +55,8 @@ const querystring = require('querystring');
         <p>Forecast: ${forecastData.Headline.Text}</p>
         <p>Min: ${Math.round((temperature.Minimum.Value - 32) / 1.8)} °C</p>
         <p>Max: ${Math.round((temperature.Maximum.Value - 32) / 1.8)} °C</p>
+        <h2>Coin Market Cap</h2>
+        ${crytoPrice}
         `, // html body
     });
 
