@@ -14,9 +14,10 @@ const { getPriceFeed } = require('./cryto');
         `)
     }).join('');
 
-    const date = momentTZ().tz('Asian/Ho_Chi_Minh').format('MMMM Do YYYY, h:mm:ss a');
-
+    // Get current date
+    const date = momentTZ(new Date()).tz('Asian/Ho_Chi_Minh').format('MMMM Do YYYY, h:mm:ss a');
     console.log('Running report: ', date);
+
     const apiKey = {
         apikey: process.env.API_KEY
     };
