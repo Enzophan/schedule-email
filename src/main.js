@@ -57,7 +57,7 @@ const { getPriceFeed } = require('./cryto');
 
     // send mail with defined transport object
     let info = await transporter.sendMail({
-        from: `"Test Email 👻" <${process.env.MAIL_FROM}>`, // sender address
+        from: `"Report daily from Zinzo 👻" <${process.env.MAIL_FROM}>`, // sender address
         to: `${process.env.MAIL_TO}`, // list of receivers
         subject: "Collect news ✔", // Subject line
         text: `Collect all news`, // plain text body
