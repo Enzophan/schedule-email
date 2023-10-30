@@ -6,7 +6,18 @@ const momentTZ = require('moment-timezone');
 const querystring = require('querystring');
 const { getPriceFeed } = require('./cryto');
 
+
 (async function run() {
+    const severity = {
+        "0": "Unknown",
+        "1": "Significant",
+        "2": "Major",
+        "3": "Moderate",
+        "4": "Minor",
+        "5": "Minimal",
+        "6": "Insignificant",
+        "7": "Informational"
+    }
     const priceFeed = await getPriceFeed();
     const crytoPrice = priceFeed.map(item => {
         return (`
@@ -51,19 +62,18 @@ const { getPriceFeed } = require('./cryto');
         subject: "Collect news ✔", // Subject line
         text: `Collect all news`, // plain text body
         html: `
-        <h1>Daily News at Date ${date}</h1>
-        <h2>Weather</h2>
-        <p>Forecast: ${forecastData.Headline.Text}</p>
-        <p>Min: ${Math.round((temperature.Minimum.Value - 32) / 1.8)} °C</p>
-        <p>Max: ${Math.round((temperature.Maximum.Value - 32) / 1.8)} °C</p>
-        <h2>Coin Market Cap</h2>
-        ${crytoPrice}
-        `, // html body
+            <h1>Daily News at Date ${date}</h1>
+            <h2>The weather in ${locationData[0].EnglishName} ${locationData[0].Type} is about to ${forecastData.Headline.Category}</h2>
+            <p>Forecast: ${forecastData.Headline.Text}</p>
+            <p>Severity of the headline: ${severity[`${forecastData.Headline.Severity}`]}</p>
+            <p>Min: ${Math.round((temperature.Minimum.Value - 32) / 1.8)} °C</p>
+            <p>Max: ${Math.round((temperature.Maximum.Value - 32) / 1.8)} °C</p>
+            <h2>Coin Market Cap</h2>
+                ${crytoPrice}
+    `, // html body
     });
 
     //formulation calculation °F to °C: https://www.rapidtables.com/convert/temperature/fahrenheit-to-celsius.html
-
     console.log("Message sent: %s", info.messageId);
-
 
 })();

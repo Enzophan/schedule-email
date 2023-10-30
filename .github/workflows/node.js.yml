@@ -33,4 +33,5 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm install
-    - run: node src/main.js
+    - run: npm run server
+    # - run: node src/main.js
