@@ -64,7 +64,7 @@ const { getPriceFeed } = require('./cryto');
         html: `
             <h1>Daily News at Date ${date}</h1>
             <h2>The weather in ${locationData[0].EnglishName} ${locationData[0].Type} is about to ${forecastData.Headline.Category}</h2>
-            <p>Forecast: ${forecastData.Headline.Text}</p>
+            <h5>Forecast: ${forecastData.Headline.Text}</h5>
             <p>Severity of the headline: ${severity[`${forecastData.Headline.Severity}`]}</p>
             <p>Min: ${Math.round((temperature.Minimum.Value - 32) / 1.8)} °C</p>
             <p>Max: ${Math.round((temperature.Maximum.Value - 32) / 1.8)} °C</p>
