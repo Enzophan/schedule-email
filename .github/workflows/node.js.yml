@@ -6,6 +6,11 @@ name: Schedule Email
 on:
   schedule:
     - cron: "0 2 * * *"
+    - cron: '5 0 * * 1-5' #At 01:00 on every day-of-week from Monday through Friday.
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
   workflow_dispatch: 
   
 env:
