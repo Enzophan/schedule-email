@@ -4,18 +4,20 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "server": "node ./src/main.js"
+    "server": "node ./src/main.js",
+    "dev": "node ./gold/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.24.0",
+    "cheerio": "^1.0.0-rc.10",
     "dotenv": "^10.0.0",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.34",
     "node-fetch": "^2.6.6",
     "nodemailer": "^6.7.0",
-    "axios": "^0.24.0",
-    "cheerio": "^1.0.0-rc.10"
+    "puppeteer": "^24.37.2"
   }
 }
