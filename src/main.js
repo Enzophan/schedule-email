@@ -32,8 +32,22 @@ const { getDataGoldPrice } = require('../gold/tasks/getPriceGold');
     )).join(" ")
 
     // Get current date
-    const date = momentTZ(new Date()).tz('Asian/Ho_Chi_Minh').format('MMMM Do YYYY, h:mm:ss a');
-    console.log('Running report: ', date);
+    // const date = momentTZ(new Date()).tz('Asian/Ho_Chi_Minh').format('MMMM Do YYYY, h:mm:ss a');
+    // console.log('Running report: ', date);
+    const serverDate = new Date(); // The current server time (UTC)
+    const options = {
+        timeZone: 'Asia/Ho_Chi_Minh',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        // second: '2-digit',
+        hour12: false
+    };
+
+    const date = serverDate.toLocaleString('en-GB', options);
+    console.log("UTC+7 Time:", date);
 
     // const apiKey = {
     //     apikey: process.env.API_KEY
