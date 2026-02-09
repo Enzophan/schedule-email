@@ -19,6 +19,7 @@ env:
   MAIL_FROM: ${{ secrets.MAIL_FROM }}
   MAIL_TO: ${{ secrets.MAIL_TO }}
   API_KEY: ${{ secrets.API_KEY }}
+  GOLD_PRICE_URL: ${{secrets.GOLD_PRICE_URL}}
 
 jobs:
   report:
