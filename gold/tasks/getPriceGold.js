@@ -56,10 +56,10 @@ const getDataGoldPrice = async () => {
 
             if (!foundSelector) {
                 // Take a screenshot for debugging
-                await page.screenshot({
-                    path: 'data/debug_page.png',
-                    fullPage: true
-                });
+                // await page.screenshot({
+                //     path: 'data/debug_page.png',
+                //     fullPage: true
+                // });
                 console.log('Debug screenshot saved to data/debug_page.png');
 
                 // Get page HTML for debugging
@@ -70,10 +70,10 @@ const getDataGoldPrice = async () => {
             }
         } catch (error) {
             console.error('Error loading or finding selectors:', error.message);
-            await page.screenshot({
-                path: 'data/error_screenshot.png',
-                fullPage: true
-            });
+            // await page.screenshot({
+            //     path: 'data/error_screenshot.png',
+            //     fullPage: true
+            // });
             throw error;
         }
         // await page.screenshot({
@@ -162,10 +162,10 @@ const getDataGoldPrice = async () => {
         console.error('Error during scraping process:', error.message);
         // Still try to take a screenshot for debugging
         try {
-            await page.screenshot({
-                path: 'data/error_final.png',
-                fullPage: true
-            });
+            // await page.screenshot({
+            //     path: 'data/error_final.png',
+            //     fullPage: true
+            // });
         } catch (screenshotError) {
             console.error('Could not take error screenshot:', screenshotError.message);
         }
