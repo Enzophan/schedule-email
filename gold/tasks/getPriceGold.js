@@ -163,7 +163,7 @@ const getDataGoldPrice = async () => {
         const todayWorldSellingPrice = await page.$eval("div#world > div > div.gold-app__price-grid > div.gold-app__price-col > div.gold-app__price-main", el => el.textContent).then(text => trimPrice(text));
         const changeWorldPrice = await page.$eval("div#world > div > div.gold-app__price-grid > div.gold-app__price-col > div.gold-app__price > div.gold-app__price-change > span:nth-child(2)", el => el.textContent).then(text => text.trim());
         console.log(`World Gold Price - Mua vào hôm nay: ${todayWorldPurchasePrice} ${changeWorldPrice}, Bán ra hôm nay: ${todayWorldSellingPrice}`);
-        // data.push({ name: "World Gold", todayPurchasePrice: `${todayWorldPurchasePrice} ${changeWorldPrice}`, todaySellingPrice: todayWorldSellingPrice, yesterdayPurchasePrice: "Null", yesterdaySellingPrice: "Null" });
+        data.push({ name: "World Gold", todayPurchasePrice: `${todayWorldPurchasePrice} ${changeWorldPrice}`, todaySellingPrice: todayWorldSellingPrice, yesterdayPurchasePrice: "Null", yesterdaySellingPrice: "Null" });
         console.log(`Successfully scraped ${data.length} gold price records`);
 
     } catch (error) {
