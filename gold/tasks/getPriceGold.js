@@ -1,5 +1,7 @@
 const puppeteer = require("puppeteer");
-// const fs = require("fs");
+const fs = require("fs");
+
+const { trimPrice } = require("./common");
 
 const getDataGoldPrice = async () => {
     const data = [];
@@ -10,7 +12,7 @@ const getDataGoldPrice = async () => {
     }
 
     const browser = await puppeteer.launch({
-        headless: true,
+        headless: process.env.MODEL === "DEV" ? false : true,
         defaultViewport: false,
         args: [
             "--no-sandbox", // Required for unprivileged environments
@@ -35,10 +37,8 @@ const getDataGoldPrice = async () => {
 
             // Try multiple potential selectors
             const selectors = [
-                'div.info-topic.box-giavang-new',
-                'div.box-giavang-new',
-                'div.info-topic',
-                'table.table-price',
+                'div.gold-app__table-box',
+                'table.gold-app__table',
                 '.gold-price-table'
             ];
 
@@ -151,12 +151,20 @@ const getDataGoldPrice = async () => {
             }
         }
 
-        console.log(`Successfully scraped ${data.length} gold price records`);
-
         // await page.screenshot({
         //     path: 'data/giavang_homnay.png',
         //     fullPage: true
         // });
+
+        /* World gold prices */
+        await page.click('div.gold-app__tabs > a[href*="/chu-de/gia-vang-the-gioi"]');
+        await page.waitForSelector("div#world > div.gold-app__price-card", { timeout: 10000 });
+        const todayWorldPurchasePrice = await page.$eval("div#world > div > div.gold-app__price-grid > div.gold-app__price-col > div.gold-app__price > div.gold-app__price-main", el => el.textContent).then(text => trimPrice(text));
+        const todayWorldSellingPrice = await page.$eval("div#world > div > div.gold-app__price-grid > div.gold-app__price-col > div.gold-app__price-main", el => el.textContent).then(text => trimPrice(text));
+        const changeWorldPrice = await page.$eval("div#world > div > div.gold-app__price-grid > div.gold-app__price-col > div.gold-app__price > div.gold-app__price-change > span:nth-child(2)", el => el.textContent).then(text => text.trim());
+        console.log(`World Gold Price - Mua vào hôm nay: ${todayWorldPurchasePrice} ${changeWorldPrice}, Bán ra hôm nay: ${todayWorldSellingPrice}`);
+        // data.push({ name: "World Gold", todayPurchasePrice: `${todayWorldPurchasePrice} ${changeWorldPrice}`, todaySellingPrice: todayWorldSellingPrice, yesterdayPurchasePrice: "Null", yesterdaySellingPrice: "Null" });
+        console.log(`Successfully scraped ${data.length} gold price records`);
 
     } catch (error) {
         console.error('Error during scraping process:', error.message);
@@ -175,14 +183,14 @@ const getDataGoldPrice = async () => {
     }
 
     /* Export Data to JSON */
-    // fs.writeFile("data/data_gold.json", JSON.stringify(data), 'utf8', (error) => {
-    //     if (error) {
-    //         // logging the error
-    //         console.error(error);
-    //         throw error;
-    //     }
-    //     console.log("data_gold.json written correctly");
-    // });
+    fs.writeFile("data/data_gold.json", JSON.stringify(data), 'utf8', (error) => {
+        if (error) {
+            // logging the error
+            console.error(error);
+            throw error;
+        }
+        console.log("data_gold.json written correctly");
+    });
 
     return data;
 }

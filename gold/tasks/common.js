@@ -53,6 +53,12 @@ const sendNotify = async (type, data) => {
 
 }
 
+const trimPrice = (price) => {
+    if (!price) return "Null";
+    return price.replace(/[^0-9.,]/g, '').trim() || "Null";
+}
+
 module.exports = {
-    sendNotify
+    sendNotify,
+    trimPrice
 }
