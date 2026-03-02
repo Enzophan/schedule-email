@@ -90,6 +90,8 @@ const getDataGoldPrice = async () => {
             'table tr'
         ];
 
+        await page.waitForSelector("div#vn.active > div.gold-app__summary", { timeout: 10000 });
+
         for (const selector of tableSelectors) {
             records = await page.$$(selector);
             if (records.length > 0) {
