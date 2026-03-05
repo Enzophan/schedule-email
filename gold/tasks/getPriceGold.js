@@ -22,19 +22,29 @@ const getDataGoldPrice = async () => {
             "--no-first-run",
             "--no-zygote",
             "--disable-gpu",
+            "--disable-web-security",
+            "--disable-features=VizDisplayCompositor",
         ],
+        timeout: 60000, // Increase launch timeout
     });
 
     const page = await browser.newPage();
+
+    // Set page timeout
+    page.setDefaultTimeout(60000);
+    page.setDefaultNavigationTimeout(60000);
 
     // Set a user agent to avoid being blocked
     await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
 
     try {
         try {
-            await page.goto(process.env.GOLD_PRICE_URL, { waitUntil: 'networkidle2' });
+            await page.goto(process.env.GOLD_PRICE_URL, { 
+                waitUntil: 'networkidle2',
+                timeout: 60000
+            });
             console.log('Page loaded successfully');
-
+            
             // Try multiple potential selectors
             const selectors = [
                 'div.gold-app__table-box',
@@ -45,12 +55,12 @@ const getDataGoldPrice = async () => {
             let foundSelector = null;
             for (const selector of selectors) {
                 try {
-                    await page.waitForSelector(selector, { timeout: 10000 });
+                    await page.waitForSelector(selector, { timeout: 30000 });
                     foundSelector = selector;
                     console.log(`Found selector: ${selector}`);
                     break;
                 } catch (err) {
-                    console.log(`Selector ${selector} not found, trying next...`);
+                    console.log(`Selector ${selector} not found after 30s, trying next...`);
                 }
             }
 
@@ -90,7 +100,7 @@ const getDataGoldPrice = async () => {
             'table tr'
         ];
 
-        await page.waitForSelector("div#vn.active > div.gold-app__summary", { timeout: 10000 });
+        await page.waitForSelector("div#vn.active > div.gold-app__summary", { timeout: 30000 });
 
         for (const selector of tableSelectors) {
             records = await page.$$(selector);
@@ -159,13 +169,22 @@ const getDataGoldPrice = async () => {
         // });
 
         /* World gold prices */
-        await page.click('div.gold-app__tabs > a[href*="/chu-de/gia-vang-the-gioi"]');
-        await page.waitForSelector("div#world > div.gold-app__price-card", { timeout: 10000 });
-        const todayWorldPurchasePrice = await page.$eval("div#world > div > div.gold-app__price-grid > div.gold-app__price-col > div.gold-app__price > div.gold-app__price-main", el => el.textContent).then(text => trimPrice(text));
-        const todayWorldSellingPrice = await page.$eval("div#world > div > div.gold-app__price-grid > div.gold-app__price-col > div.gold-app__price-main", el => el.textContent).then(text => trimPrice(text));
-        const changeWorldPrice = await page.$eval("div#world > div > div.gold-app__price-grid > div.gold-app__price-col > div.gold-app__price > div.gold-app__price-change > span:nth-child(2)", el => el.textContent).then(text => text.trim());
-        console.log(`World Gold Price - Mua vào hôm nay: ${todayWorldPurchasePrice} ${changeWorldPrice}, Bán ra hôm nay: ${todayWorldSellingPrice}`);
-        data.push({ name: "World Gold", todayPurchasePrice: `${todayWorldPurchasePrice} ${changeWorldPrice}`, todaySellingPrice: todayWorldSellingPrice, yesterdayPurchasePrice: "Null", yesterdaySellingPrice: "Null" });
+        try {
+            await page.click('div.gold-app__tabs > a[href*="/chu-de/gia-vang-the-gioi"]');
+            await page.waitForSelector("div#world > div.gold-app__price-card", { timeout: 30000 });
+        } catch (worldError) {
+            console.warn('Could not load world gold prices:', worldError.message);
+            // Continue with domestic prices only
+        }
+        try {
+            const todayWorldPurchasePrice = await page.$eval("div#world > div > div.gold-app__price-grid > div.gold-app__price-col > div.gold-app__price > div.gold-app__price-main", el => el.textContent).then(text => trimPrice(text));
+            const todayWorldSellingPrice = await page.$eval("div#world > div > div.gold-app__price-grid > div.gold-app__price-col > div.gold-app__price-main", el => el.textContent).then(text => trimPrice(text));
+            const changeWorldPrice = await page.$eval("div#world > div > div.gold-app__price-grid > div.gold-app__price-col > div.gold-app__price > div.gold-app__price-change > span:nth-child(2)", el => el.textContent).then(text => text.trim());
+            console.log(`World Gold Price - Mua vào hôm nay: ${todayWorldPurchasePrice} ${changeWorldPrice}, Bán ra hôm nay: ${todayWorldSellingPrice}`);
+            data.push({ name: "World Gold", todayPurchasePrice: `${todayWorldPurchasePrice} ${changeWorldPrice}`, todaySellingPrice: todayWorldSellingPrice, yesterdayPurchasePrice: "Null", yesterdaySellingPrice: "Null" });
+        } catch (extractError) {
+            console.warn('Could not extract world gold price data:', extractError.message);
+        }
         console.log(`Successfully scraped ${data.length} gold price records`);
 
     } catch (error) {
