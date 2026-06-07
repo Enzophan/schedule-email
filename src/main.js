@@ -6,6 +6,7 @@ const momentTZ = require('moment-timezone');
 const querystring = require('querystring');
 const { getPriceFeed } = require('./cryto');
 const { getDataGoldPrice } = require('../gold/tasks/getPriceGold');
+const { fetchNotionTasks } = require('./notion');
 
 
 (async function run() {
@@ -75,6 +76,55 @@ const { getDataGoldPrice } = require('../gold/tasks/getPriceGold');
         },
     });
 
+    let notionTasksHtml = '';
+    try {
+        const notionTasks = await fetchNotionTasks(process.env.NOTION_API_KEY, process.env.NOTION_DATABASE_ID);
+        if (notionTasks.length > 0) {
+            notionTasksHtml = `
+                <h2 style="color: #333; border-bottom: 2px solid #eaeaea; padding-bottom: 8px;">Notion Tasks</h2>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    ${notionTasks.map(task => {
+                        let statusColor = '#6c757d';
+                        let statusBg = '#e2e3e5';
+                        const status = task.status.toLowerCase();
+                        if (status === 'completed' || status === 'done' || status === 'complete') {
+                            statusColor = '#28a745';
+                            statusBg = '#d4edda';
+                        } else if (status === 'to do' || status === 'not started' || status === 'todo') {
+                            statusColor = '#dc3545';
+                            statusBg = '#f8d7da';
+                        } else if (status === 'in progress' || status === 'doing') {
+                            statusColor = '#ffc107';
+                            statusBg = '#fff3cd';
+                        }
+                        
+                        return `
+                            <li style="margin-bottom: 10px; padding: 12px; border-radius: 6px; border-left: 5px solid ${statusColor}; background-color: #f8f9fa; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+                                <span style="display: inline-block; padding: 3px 8px; font-size: 0.75em; font-weight: bold; border-radius: 4px; color: ${statusColor}; background-color: ${statusBg}; margin-right: 12px; text-transform: uppercase;">
+                                    ${task.status}
+                                </span>
+                                <a href="${task.url}" target="_blank" style="text-decoration: none; color: #007bff; font-weight: 600; font-size: 0.95em;">
+                                    ${task.title}
+                                </a>
+                            </li>
+                        `;
+                    }).join('')}
+                </ul>
+            `;
+        } else {
+            notionTasksHtml = `
+                <h2 style="color: #333; border-bottom: 2px solid #eaeaea; padding-bottom: 8px;">Notion Tasks</h2>
+                <p style="color: #6c757d; font-style: italic; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">No tasks found in Notion database.</p>
+            `;
+        }
+    } catch (error) {
+        console.error("Error fetching Notion tasks:", error);
+        notionTasksHtml = `
+            <h2 style="color: #333; border-bottom: 2px solid #eaeaea; padding-bottom: 8px;">Notion Tasks</h2>
+            <p style="color: #dc3545; font-weight: bold; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Error retrieving tasks from Notion: ${error.message}</p>
+        `;
+    }
+
     // send mail with defined transport object
     let info = await transporter.sendMail({
         from: `"Report daily from Zinzo 👻" <${process.env.MAIL_FROM}>`, // sender address
@@ -85,6 +135,7 @@ const { getDataGoldPrice } = require('../gold/tasks/getPriceGold');
             <h1>Daily News at Date ${date}</h1>
             <h2>Gold Price</h2>
                 ${goldPrice}
+            ${notionTasksHtml}
     `,
     });
 
