@@ -20,6 +20,9 @@ env:
   MAIL_TO: ${{ secrets.MAIL_TO }}
   API_KEY: ${{ secrets.API_KEY }}
   GOLD_PRICE_URL: ${{secrets.GOLD_PRICE_URL}}
+  NOTION_API_KEY: ${{secrets.NOTION_API_KEY}}
+  NOTION_DATABASE_ID: ${{secrets.NOTION_DATABASE_ID}}
+
 
 jobs:
   report:
